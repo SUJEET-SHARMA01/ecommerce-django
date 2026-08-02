@@ -1,0 +1,53 @@
+{% extends "base.html" %} {% block title %}{{ product.name }}{% endblock %} 
+{%block content %}
+
+<div class="container my-5">
+  <div class="row">
+    <!-- Product Image -->
+    <div class="col-md-6">
+      <img
+        src="{{ product.image.url }}"
+        class="img-fluid rounded shadow"
+        alt="{{ product.name }}"
+      />
+    </div>
+
+    <!-- Product Details -->
+    <div class="col-md-6">
+      <h2 class="fw-bold">{{ product.name }}</h2>
+
+      <h3 class="text-success mt-3">₹{{ product.price }}</h3>
+
+      <p class="mt-4">{{ product.description }}</p>
+
+      <h5 class="mt-3">
+        Stock : {% if product.stock > 0 %}
+        <span class="text-success">In Stock ({{ product.stock }})</span>
+        {% else %}
+        <span class="text-danger">Out of Stock</span>
+        {% endif %}
+      </h5>
+
+      <div class="mt-4">
+        <label class="form-label fw-bold"> Quantity </label>
+
+        <input
+          type="number"
+          class="form-control w-25"
+          value="1"
+          min="1"
+          max="{{ product.stock }}"
+        />
+      </div>
+
+      <div class="mt-4">
+        <a href="{% url 'add_to_cart' product.id %}" class="btn btn-primary">
+          Add to Cart
+        </a>
+
+        <button class="btn btn-success">Buy Now</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
