@@ -1,52 +1,47 @@
 {% extends "base.html" %}
-
 {% block title %}Home{% endblock %}
-
 {% block content %}
 
 {% include "includes/slider.html" %}
 
 <div class="container mt-5">
-
     <h2 class="text-center mb-4">Our Products</h2>
 
-    <div class="row">
+    <div class="row g-4">
 
         {% for product in products %}
+        <div class="col-lg-2 col-md-3 col-sm-4 col-6 mb-4">
+    <div class="card product-card h-100 shadow-sm">
 
-        <div class="col-lg-4 col-md-4 col-sm-6 mb-4">
+        <div class="product-img-box">
+            <img src="{{ product.image.url }}"
+                 class="product-img"
+                 alt="{{ product.name }}">
+        </div>
 
-            <div class="card h-100 shadow">
+        <div class="card-body d-flex flex-column text-center">
 
-                <img src="{{ product.image.url }}"
-                     class="card-img-top"
-                     style="height:250px; object-fit:cover;"
-                     alt="{{ product.name }}">
+            <h6 class="card-title">
+                {{ product.name|truncatechars:20 }}
+            </h6>
 
-                <div class="card-body d-flex flex-column">
+            <h5 class="text-success fw-bold">
+                ₹{{ product.price }}
+            </h5>
 
-                    <h5 class="card-title">{{ product.name }}</h5>
-
-                    <h4 class="text-success">₹{{ product.price }}</h4>
-
-                    <p class="card-text">
-                        {{ product.description|truncatewords:12 }}
-                    </p>
-
-                    <a href=" {% url "productDetails" product.id %}" class="btn btn-primary mt-auto">
-                        View Details
-                    </a>
-
-                </div>
-
-            </div>
+            <a href="{% url 'productDetails' product.id %}"
+               class="btn btn-primary btn-sm mt-auto">
+                View Details
+            </a>
 
         </div>
+
+    </div>
+</div>
 
         {% endfor %}
 
     </div>
-
 </div>
  {% include "includes/footer.html" %}
 {% endblock %}

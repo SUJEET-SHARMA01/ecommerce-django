@@ -1,7 +1,8 @@
-from django.shortcuts import render,get_object_or_404,redirect,redirect
+from django.shortcuts import render,get_object_or_404,redirect
 from . models import Product, Cart
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout 
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
 # Create your views here.
@@ -20,6 +21,7 @@ def productDetails(request, id):
     product = get_object_or_404(Product,id=id)
     return render(request, 'includes/productDetails.html', {'product':product})
 
+@login_required(login_url="login")
 def add_to_cart(request, id):
     product = get_object_or_404(Product, id=id)
 
@@ -34,9 +36,9 @@ def add_to_cart(request, id):
 
     return redirect("cart")
 
-
+@login_required(login_url="login")
 def cart(request):
-    cart_items = Cart.objects.all()
+    cart_items = Cart.objects.filter(user=request.user)
 
     total = 0
 
@@ -49,13 +51,13 @@ def cart(request):
     })
 
 def increase_quantity(request, id):
-    cart_item = get_object_or_404(Cart,id=id)
+    cart_item = get_object_or_404(Cart,id=id , user=request.user)
     cart_item.quantity += 1
     cart_item.save()
     return redirect("cart")
 
 def decrease_quantity(request, id):
-    cart_item = get_object_or_404(Cart, id=id)
+    cart_item = get_object_or_404(Cart, id=id, user=request.user)
 
     if cart_item.quantity > 1:
         cart_item.quantity -= 1
@@ -66,7 +68,7 @@ def decrease_quantity(request, id):
     return redirect("cart")
 
 def remove_cart(request, id):
-    cart_item = get_object_or_404(Cart, id=id)
+    cart_item = get_object_or_404(Cart, id=id, user=request.user)
     cart_item.delete()
     return redirect("cart")
 
@@ -83,6 +85,7 @@ def register(request):
 
         if User.objects.filter(username=username).exists():
             messages.error(request, "username already exist")
+            return redirect("register")
 
 
         User.objects.create_user(
