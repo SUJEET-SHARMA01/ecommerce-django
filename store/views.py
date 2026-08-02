@@ -1,5 +1,9 @@
-from django.shortcuts import render,get_object_or_404,redirect
+from django.shortcuts import render,get_object_or_404,redirect,redirect
 from . models import Product, Cart
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
+
 # Create your views here.
 def home(request):
     products = Product.objects.all()
@@ -65,3 +69,56 @@ def remove_cart(request, id):
     cart_item = get_object_or_404(Cart, id=id)
     cart_item.delete()
     return redirect("cart")
+
+def register(request):
+    if request.method == "POST":
+        username = request.POST['username']
+        email = request.POST['email']
+        password = request.POST['password']
+        confirm_password = request.POST['confirm_password']
+
+        if password != confirm_password:
+            messages.error(request, "password do not match")
+            return redirect("register")
+
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "username already exist")
+
+
+        User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+
+        )
+        messages.success(request, "account created successfully")
+        return redirect("login")
+
+    return render(request, "includes/register.html")
+
+
+def user_login(request):
+    
+    if request.method == "POST":
+
+        username = request.POST["username"]
+        password = request.POST["password"]
+
+        user = authenticate(
+            request,
+            username=username,
+            password=password
+        )
+
+        if user is not None:
+            login(request, user)
+            messages.success(request, "Login successful.")
+            return redirect("home")
+
+        messages.error(request, "Invalid username or password.")
+
+    return render(request, "includes/login.html")
+
+def user_logout(request):
+    logout(request)
+    return redirect("home")
